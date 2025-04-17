@@ -1,113 +1,63 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --background: 222 47% 7%;
-    --foreground: 210 40% 98%;
-
-    --card: 222 47% 9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222 47% 9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 252 62% 75%;
-    --primary-foreground: 222 47% 7%;
-
-    --secondary: 217 32% 12%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217 32% 12%;
-    --muted-foreground: 215 20% 65%;
-
-    --accent: 217 32% 12%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217 32% 15%;
-    --input: 217 32% 15%;
-    --ring: 224 76% 48%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 222 47% 5%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 252 62% 75%;
-    --sidebar-primary-foreground: 0 0% 10%;
-    --sidebar-accent: 222 47% 10%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 222 47% 12%;
-    --sidebar-ring: 224 76% 48%;
-  }
-}
-
-@layer base {
   * {
-    @apply border-border;
+    @apply border-border; /* Uses border color from tailwind config */
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-black text-white antialiased; /* Updated to solid black and white theme */
   }
 
-  /* Custom scrollbar */
+  /* Custom scrollbar - Black & White */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
+    background: #000; /* Black scrollbar background */
   }
 
   ::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.3);
+    background: #000; /* Black track */
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.15);
+    background: #FFFFFF; /* White thumb */
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: #DDDDDD; /* Slightly off-white on hover */
   }
 }
 
 @layer utilities {
-  .glass-panel {
-    @apply bg-secondary/30 backdrop-blur-sm border border-white/10;
-  }
-  
-  .text-gradient {
-    @apply bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent;
-  }
-
+  /* Removed .glass-panel and .text-gradient */
   .panel-transition {
     @apply transition-all duration-300 ease-in-out;
   }
 }
 
-/* Code block styling */
+/* Code block styling - Black & White */
 .prose pre {
-  @apply bg-black/70 text-white p-4 rounded-md my-4 overflow-x-auto;
+  @apply bg-black border border-white text-white p-4 rounded-md my-4 overflow-x-auto; /* Black bg, white border/text */
 }
 
 .prose code {
-  @apply font-mono text-sm;
+  @apply font-mono text-sm text-white; /* Ensure code text is white */
 }
 
 .prose p code {
-  @apply bg-black/30 text-white px-1 py-0.5 rounded;
+  @apply bg-black border border-white text-white px-1 py-0.5 rounded; /* Inline code: Black bg, white border/text */
 }
 
 .prose h1, .prose h2, .prose h3, .prose h4 {
-  @apply text-white mb-4 mt-6 font-semibold;
+  @apply text-white mb-4 mt-6 font-semibold; /* Keep headings white */
 }
 
 .prose h1 {
-  @apply text-2xl;
+  @apply text-2xl; 
 }
 
 .prose h2 {
@@ -139,31 +89,80 @@
 }
 
 .prose blockquote {
-  @apply border-l-4 border-primary/50 pl-4 italic my-4;
+  @apply border-l-4 border-white pl-4 italic my-4 text-white; /* White border and text */
 }
 
 .prose a {
-  @apply text-primary underline;
+  @apply text-white underline; /* White links */
 }
 
-.prose-purple {
-  @apply prose max-w-none text-white;
+/* Use base prose and ensure text is white */
+.prose { 
+  @apply max-w-none text-white;
 }
+/* Remove .prose-purple as it's redundant now */
 
 .markdown table {
-  @apply border-collapse w-full my-4;
+  @apply border-collapse w-full my-4 border border-white; /* White border for table */
 }
 
 .markdown thead {
-  @apply bg-secondary/70;
+  @apply bg-black; /* Black header background */
 }
 
 .markdown th {
-  @apply text-left p-2 border border-secondary;
+  @apply text-left p-2 border border-white text-white; /* White border/text for headers */
 }
 
 .markdown td {
-  @apply p-2 border border-secondary;
+  @apply p-2 border border-white text-white; /* White border/text for cells */
+}
+
+/* Sidebar and modal enhancements */
+.bg-sidebar, .bg-sidebar-accent, .bg-card, .bg-popover, .bg-secondary, .bg-background {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+.text-sidebar-foreground, .text-card-foreground, .text-popover-foreground, .text-secondary-foreground, .text-foreground {
+  color: #fff !important;
+}
+.border-sidebar-border, .border-white, .border-card, .border-popover, .border-secondary, .border-background {
+  border-color: #fff !important;
+}
+input, textarea, select {
+  background: #000 !important;
+  color: #fff !important;
+  border-color: #fff !important;
+}
+input::placeholder, textarea::placeholder {
+  color: #fff8 !important;
+}
+button, .btn, .bg-primary, .bg-white {
+  background: #fff !important;
+  color: #000 !important;
+  border-color: #fff !important;
+}
+button:hover, .btn:hover, .bg-primary:hover, .bg-white:hover {
+  background: #fff8 !important;
+  color: #000 !important;
+}
+
+/* Chat bubbles */
+.bg-chat-user, .bg-chat-assistant {
+  background: #000 !important;
+  color: #fff !important;
+}
+
+/* Modal dialog */
+.radix-dialog-content, .DialogContent {
+  background: #000 !important;
+  color: #fff !important;
+  border-color: #fff !important;
+}
+
+/* Gallery images */
+img {
+  background: #000;
 }
 
 /* Animation for panel transition */

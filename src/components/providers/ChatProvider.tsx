@@ -1,9 +1,17 @@
-
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 // Declare the global puter object for TypeScript
-declare const puter: any;
+declare global {
+  interface Window {
+    puter: {
+      ai: {
+        chat: (messages: { role: string; content: string }[], options: { model: string; stream: boolean }) => AsyncIterableIterator<{ text: string }>;
+        txt2img: (prompt: string, testMode: boolean) => Promise<string>;
+      };
+    };
+  }
+}
 
 export type Message = {
   id: string;
@@ -31,12 +39,15 @@ type ChatContextType = {
   setApiProvider: (provider: ApiProvider) => void;
   setModel: (model: string) => void;
   startNewChat: () => void;
+  restoreChat: (messages: Message[]) => void;
+  imageGallery: { id: string; prompt: string; url: string }[];
+  generateImage: (prompt: string) => Promise<void>;
 };
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
 const MODELS = {
-  "puter.js": ["gpt-4o-mini", "gpt-4o", "claude-3-5-sonnet", "gemini-1.5-flash", "pixtral-large-latest"],
+  "puter.js": ["gpt-4-turbo", "gpt-4", "claude-3-sonnet", "gemini-1.5-pro", "mixtral-8x7b"],
   "openrouter": ["openai/gpt-4", "anthropic/claude-3-opus", "mistral/mistral-large"],
   "google-ai-studio": ["gemini-pro", "gemini-ultra", "palm-2"],
 };
@@ -45,11 +56,12 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [apiProvider, setApiProvider] = useState<ApiProvider>("puter.js");
-  const [model, setModel] = useState("gpt-4o-mini");
+  const [model, setModel] = useState("gpt-4-turbo");
   const [customProviders, setCustomProviders] = useState<string[]>([]);
   const [customProviderModels, setCustomProviderModels] = useState<Record<string, string[]>>({});
   const [customProviderInput, setCustomProviderInput] = useState("");
   const [customModelInput, setCustomModelInput] = useState("");
+  const [imageGallery, setImageGallery] = useState<{ id: string; prompt: string; url: string }[]>([]);
 
   // Determine available models based on selected API provider
   const availableModels = React.useMemo(() => {
@@ -88,6 +100,17 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
   // Send a message
   const sendMessage = async (content: string) => {
+    if (!window.puter) {
+      const errorMessage: Message = {
+        id: uuidv4(),
+        role: "assistant",
+        content: "The Puter.ai API is not available. Please make sure you're running this in the correct environment.",
+        type: 'text',
+      };
+      setMessages(prev => [...prev, errorMessage]);
+      return;
+    }
+
     // Add user message
     const userMessage: Message = {
       id: uuidv4(),
@@ -106,14 +129,31 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
       if (content.startsWith("/image ")) {
         const prompt = content.substring(7).trim(); // Extract prompt after "/image "
         if (prompt) {
-          // Use puter.ai.txt2img (with testMode=true as requested)
-          const imageDataUrl = await puter.ai.txt2img(prompt, true);
-          assistantMessage = {
-            id: uuidv4(),
-            role: "assistant",
-            content: imageDataUrl, // Store the image data URL
-            type: 'image',
-          };
+          try {
+            // Use window.puter.ai.txt2img (with testMode=true as requested)
+            const imageDataUrl = await window.puter.ai.txt2img(prompt, true);
+            if (!imageDataUrl) {
+              throw new Error("Failed to generate image");
+            }
+            assistantMessage = {
+              id: uuidv4(),
+              role: "assistant",
+              content: imageDataUrl, // Store the image data URL
+              type: 'image',
+            };
+            // Add to image gallery
+            setImageGallery(prev => [
+              { id: assistantMessage.id, prompt, url: imageDataUrl },
+              ...prev,
+            ]);
+          } catch (imageError) {
+            assistantMessage = {
+              id: uuidv4(),
+              role: "assistant",
+              content: `Failed to generate image: ${imageError instanceof Error ? imageError.message : 'Unknown error'}`,
+              type: 'text',
+            };
+          }
         } else {
           // Handle empty prompt case
           assistantMessage = {
@@ -123,20 +163,49 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
             type: 'text',
           };
         }
+        setMessages(prev => [...prev, assistantMessage]);
       } else {
-        // Simulate regular text API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        assistantMessage = {
-          id: uuidv4(),
+        // Prepare messages for window.puter.ai.chat()
+        // Filter out any potential 'image' type messages from history for chat endpoint
+        const chatHistory = [...messages, userMessage]
+          .filter(msg => msg.type !== 'image') 
+          .map(({ role, content }) => ({ role, content }));
+
+        // --- Streaming Implementation ---
+        // Create a placeholder for the assistant message
+        const assistantMessageId = uuidv4();
+        const initialAssistantMessage: Message = {
+          id: assistantMessageId,
           role: "assistant",
-          content: `I'm using the ${apiProvider} provider with the ${model} model.\n\nYour message was: "${content}"\n\nThis is a simulated response since we're not actually connecting to ${apiProvider}.`,
+          content: "", // Start with empty content
           type: 'text',
         };
-      }
+        setMessages((prev) => [...prev, initialAssistantMessage]);
 
-      setMessages((prev) => [...prev, assistantMessage]);
+        // Call window.puter.ai.chat() with streaming enabled
+        const stream = await window.puter.ai.chat(chatHistory, { model, stream: true });
+
+        // Process the stream
+        let accumulatedContent = "";
+        for await (const part of stream) {
+          if (part?.text) {
+            accumulatedContent += part.text;
+            // Update the specific assistant message content
+            setMessages((prevMessages) =>
+              prevMessages.map((msg) =>
+                msg.id === assistantMessageId
+                  ? { ...msg, content: accumulatedContent }
+                  : msg
+              )
+            );
+          }
+        }
+        // --- End Streaming Implementation ---
+      }
+      // Note: No need to add assistant message here again, it's handled during streaming
     } catch (error) {
       console.error("Error processing message:", error);
+      // Keep existing error handling
       // Add an error message to the chat
       const errorMessage: Message = {
         id: uuidv4(),
@@ -151,9 +220,36 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // --- Sidebar Image Generation ---
+  const generateImage = async (prompt: string) => {
+    if (!window.puter) return;
+    try {
+      const imageDataUrl = await window.puter.ai.txt2img(prompt, true);
+      if (imageDataUrl) {
+        const id = uuidv4();
+        setImageGallery(prev => [
+          { id, prompt, url: imageDataUrl },
+          ...prev,
+        ]);
+        // Optionally, add to chat as well:
+        setMessages(prev => [
+          ...prev,
+          { id, role: "assistant", content: imageDataUrl, type: 'image' },
+        ]);
+      }
+    } catch (e) {
+      // Optionally, handle error
+    }
+  };
+
   // Start a new chat
   const startNewChat = () => {
     setMessages([]);
+  };
+
+  // Restore a previous chat
+  const restoreChat = (chatMessages: Message[]) => {
+    setMessages(chatMessages);
   };
 
   return (
@@ -175,6 +271,9 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
         setApiProvider,
         setModel,
         startNewChat,
+        restoreChat,
+        imageGallery,
+        generateImage,
       }}
     >
       {children}

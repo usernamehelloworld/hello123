@@ -20,52 +20,52 @@ export default {
 		},
 		extend: {
 			colors: {
-				border: 'hsl(var(--border))',
-				input: 'hsl(var(--input))',
-				ring: 'hsl(var(--ring))',
-				background: 'hsl(var(--background))',
-				foreground: 'hsl(var(--foreground))',
+				border: '#FFFFFF', // White border
+				input: '#FFFFFF',  // White border/ring for input
+				ring: '#FFFFFF',   // White ring
+				background: '#000000', // Black background
+				foreground: '#FFFFFF', // White text
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					DEFAULT: '#FFFFFF', // White primary elements (buttons, etc.)
+					foreground: '#000000' // Black text on primary elements
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
+					DEFAULT: '#000000', // Black secondary elements
+					foreground: '#FFFFFF' // White text on secondary elements
 				},
-				destructive: {
-					DEFAULT: 'hsl(var(--destructive))',
-					foreground: 'hsl(var(--destructive-foreground))'
+				destructive: { // Map destructive to contrast
+					DEFAULT: '#FFFFFF', 
+					foreground: '#000000' 
 				},
-				muted: {
-					DEFAULT: 'hsl(var(--muted))',
-					foreground: 'hsl(var(--muted-foreground))'
+				muted: { // Map muted to contrast
+					DEFAULT: '#000000', 
+					foreground: '#FFFFFF' 
 				},
-				accent: {
-					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
+				accent: { // Map accent to contrast
+					DEFAULT: '#FFFFFF', 
+					foreground: '#000000' 
 				},
 				popover: {
-					DEFAULT: 'hsl(var(--popover))',
-					foreground: 'hsl(var(--popover-foreground))'
+					DEFAULT: '#000000', // Black popover background
+					foreground: '#FFFFFF' // White popover text
 				},
 				card: {
-					DEFAULT: 'hsl(var(--card))',
-					foreground: 'hsl(var(--card-foreground))'
+					DEFAULT: '#000000', // Black card background
+					foreground: '#FFFFFF' // White card text
 				},
 				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
+					DEFAULT: '#000000', // Black sidebar background
+					foreground: '#FFFFFF', // White sidebar text
+					primary: '#FFFFFF', // White accents in sidebar
+					'primary-foreground': '#000000', // Black text on sidebar accents
+					accent: '#000000', // Black accent background in sidebar
+					'accent-foreground': '#FFFFFF', // White text on sidebar accent background
+					border: '#FFFFFF', // White border in sidebar
+					ring: '#FFFFFF' // White ring in sidebar
 				},
 				chat: {
-					user: '#1E293B', // Darker blue for user messages
-					assistant: '#0F172A', // Very dark blue for assistant messages
+					user: '#000000', // Black background for user messages
+					assistant: '#000000', // Black background for assistant messages
 				}
 			},
 			borderRadius: {

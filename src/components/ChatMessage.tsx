@@ -57,8 +57,9 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
               <img src={message.content} alt="Generated image" className="max-w-full h-auto rounded-md" />
             ) : (
               // Render markdown for text messages
+              // Removed prose-purple and dark:prose-invert, using base prose styles from index.css
               <ReactMarkdown
-                className="prose prose-purple dark:prose-invert"
+                className="prose" 
                 components={{
                   code({ node, inline, className, children, ...props }: CodeProps) {
                   const match = /language-(\w+)/.exec(className || "");
@@ -69,14 +70,15 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
                       <div className="relative group">
                         <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
-                            onClick={() => copyToClipboard(code)}
-                            className="p-1 rounded hover:bg-white/10"
-                            aria-label="Copy code"
-                          >
-                            <Copy className="h-4 w-4 text-white/70" />
-                          </button>
-                        </div>
-                        <SyntaxHighlighter
+                           onClick={() => copyToClipboard(code)}
+                           // Updated copy button style for B&W theme
+                           className="p-1 rounded bg-black text-white hover:bg-white hover:text-black border border-white"
+                           aria-label="Copy code"
+                         >
+                           <Copy className="h-4 w-4" /> 
+                         </button>
+                       </div>
+                       <SyntaxHighlighter
                           language={match[1]}
                           style={vscDarkPlus}
                           PreTag="div"
@@ -97,14 +99,15 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
                       <div className="relative group">
                         <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
-                            onClick={() => copyToClipboard(code)}
-                            className="p-1 rounded hover:bg-white/10"
-                            aria-label="Copy code"
-                          >
-                            <Copy className="h-4 w-4 text-white/70" />
-                          </button>
-                        </div>
-                        <SyntaxHighlighter
+                           onClick={() => copyToClipboard(code)}
+                            // Updated copy button style for B&W theme
+                           className="p-1 rounded bg-black text-white hover:bg-white hover:text-black border border-white"
+                           aria-label="Copy code"
+                         >
+                           <Copy className="h-4 w-4" />
+                         </button>
+                       </div>
+                       <SyntaxHighlighter
                           language="text"
                           style={vscDarkPlus}
                           PreTag="div"
@@ -120,16 +123,10 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
                   return (
                     <div className="overflow-x-auto">
                       <table className="markdown" {...props} />
-                    </div>
-                  );
-                  },
-                  table({ node, ...props }) {
-                    return (
-                      <div className="overflow-x-auto">
-                        <table className="markdown" {...props} />
                       </div>
                     );
                   },
+                  // Removed duplicate table definition
                 }}
               >
                 {message.content}

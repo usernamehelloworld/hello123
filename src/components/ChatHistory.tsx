@@ -1,41 +1,62 @@
-
 import React from "react";
 import { useChat, Message } from "./providers/ChatProvider";
 import { cn } from "@/lib/utils";
 import { MessageSquare } from "lucide-react";
 
+interface Conversation {
+  id: string;
+  title: string;
+  preview: string;
+  date: Date;
+  messages: Message[];
+}
+
 const ChatHistory = () => {
-  const { messages, startNewChat } = useChat();
+  const { messages, startNewChat, restoreChat } = useChat();
   
-  // Group messages by conversation (this is a simplified implementation)
-  // In a real app, you'd track conversation IDs
+  // Group messages into conversations
   const conversations = React.useMemo(() => {
     if (messages.length === 0) return [];
     
-    // Simple grouping - each user message starts a new "conversation"
-    const chats: { id: string; title: string; preview: string; date: Date }[] = [];
-    let currentDate = new Date();
+    const chats: Conversation[] = [];
+    let currentConversation: Conversation | null = null;
     
-    // Extract the first few words of the first user message as the title
-    for (let i = 0; i < messages.length; i++) {
-      if (messages[i].role === "user") {
-        const title = messages[i].content.substring(0, 30) + (messages[i].content.length > 30 ? "..." : "");
-        const preview = messages[i].content.substring(0, 60) + (messages[i].content.length > 60 ? "..." : "");
+    messages.forEach((message, index) => {
+      // Start a new conversation with each user message
+      if (message.role === "user") {
+        if (currentConversation) {
+          chats.push(currentConversation);
+        }
         
-        chats.push({
-          id: messages[i].id,
-          title,
-          preview,
-          date: currentDate
-        });
-        
-        // For demo purposes, offset the date by a random amount
-        currentDate = new Date(currentDate.getTime() - Math.random() * 24 * 60 * 60 * 1000);
+        currentConversation = {
+          id: message.id,
+          title: message.content.substring(0, 30) + (message.content.length > 30 ? "..." : ""),
+          preview: message.content.substring(0, 60) + (message.content.length > 60 ? "..." : ""),
+          date: new Date(),
+          messages: [message]
+        };
+      } else if (currentConversation) {
+        currentConversation.messages.push(message);
+        // Update preview to include AI response
+        if (message.type === 'text') {
+          currentConversation.preview = message.content.substring(0, 60) + (message.content.length > 60 ? "..." : "");
+        } else if (message.type === 'image') {
+          currentConversation.preview = "[Image Generated]";
+        }
       }
+    });
+
+    // Add the last conversation if exists
+    if (currentConversation) {
+      chats.push(currentConversation);
     }
     
     return chats.reverse();
   }, [messages]);
+
+  const handleConversationClick = (conversation: Conversation) => {
+    restoreChat(conversation.messages);
+  };
 
   return (
     <div className="h-full flex flex-col">
@@ -59,6 +80,7 @@ const ChatHistory = () => {
             {conversations.map((chat) => (
               <button
                 key={chat.id}
+                onClick={() => handleConversationClick(chat)}
                 className="w-full text-left p-3 hover:bg-sidebar-accent rounded-md transition-colors"
               >
                 <div className="font-medium text-sm text-sidebar-foreground truncate">
@@ -68,7 +90,13 @@ const ChatHistory = () => {
                   {chat.preview}
                 </div>
                 <div className="text-xs text-sidebar-foreground/50 mt-1">
-                  {chat.date.toLocaleDateString()}
+                  {chat.date.toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
                 </div>
               </button>
             ))}

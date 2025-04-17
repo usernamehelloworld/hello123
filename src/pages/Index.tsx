@@ -12,7 +12,8 @@ import { Button } from "@/components/ui/button";
 // ChatContainer component to separate chat UI from providers
 const ChatContainer = () => {
   const { messages, isProcessing } = useChat();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  // Start with sidebar closed
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); 
   const [showScrollButton, setShowScrollButton] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -57,26 +58,9 @@ const ChatContainer = () => {
       <main className={`flex-1 flex flex-col relative transition-all duration-300 ${isSidebarOpen ? 'md:ml-64' : 'ml-0'}`}>
         <SidebarToggle isOpen={isSidebarOpen} toggle={toggleSidebar} />
         
+        {/* Removed initial welcome message block */}
         {messages.length === 0 ? (
-          <div className="flex-1 flex items-center justify-center p-4">
-            <div className="max-w-md text-center">
-              <h1 className="text-2xl font-bold mb-4 text-gradient">AI Chat Assistant</h1>
-              <p className="text-muted-foreground mb-6">
-                This is a ChatGPT clone with an enhanced side panel for API and model selection.
-              </p>
-              <div className="flex justify-center">
-                <div className="glass-panel p-4 rounded-lg text-left space-y-3 w-full">
-                  <p className="text-sm font-medium">Example prompts:</p>
-                  <ul className="text-sm text-muted-foreground space-y-2">
-                    <li>• Explain quantum computing in simple terms</li>
-                    <li>• Write a short poem about artificial intelligence</li>
-                    <li>• How do I make an HTTP request in JavaScript?</li>
-                    <li>• Suggest a healthy meal plan for a week</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div className="flex-1"></div> /* Render an empty div when no messages */
         ) : (
           <div
             ref={chatContainerRef}
