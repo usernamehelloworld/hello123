@@ -1,0 +1,183 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 47% 7%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 47% 9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 252 62% 75%;
+    --primary-foreground: 222 47% 7%;
+
+    --secondary: 217 32% 12%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217 32% 12%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 217 32% 12%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 32% 15%;
+    --input: 217 32% 15%;
+    --ring: 224 76% 48%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 222 47% 5%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 252 62% 75%;
+    --sidebar-primary-foreground: 0 0% 10%;
+    --sidebar-accent: 222 47% 10%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 222 47% 12%;
+    --sidebar-ring: 224 76% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-secondary/30 backdrop-blur-sm border border-white/10;
+  }
+  
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent;
+  }
+
+  .panel-transition {
+    @apply transition-all duration-300 ease-in-out;
+  }
+}
+
+/* Code block styling */
+.prose pre {
+  @apply bg-black/70 text-white p-4 rounded-md my-4 overflow-x-auto;
+}
+
+.prose code {
+  @apply font-mono text-sm;
+}
+
+.prose p code {
+  @apply bg-black/30 text-white px-1 py-0.5 rounded;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  @apply text-white mb-4 mt-6 font-semibold;
+}
+
+.prose h1 {
+  @apply text-2xl;
+}
+
+.prose h2 {
+  @apply text-xl;
+}
+
+.prose h3 {
+  @apply text-lg;
+}
+
+.prose p {
+  @apply my-3;
+}
+
+.prose ul, .prose ol {
+  @apply my-4 pl-8;
+}
+
+.prose ul {
+  @apply list-disc;
+}
+
+.prose ol {
+  @apply list-decimal;
+}
+
+.prose li {
+  @apply my-1;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-primary/50 pl-4 italic my-4;
+}
+
+.prose a {
+  @apply text-primary underline;
+}
+
+.prose-purple {
+  @apply prose max-w-none text-white;
+}
+
+.markdown table {
+  @apply border-collapse w-full my-4;
+}
+
+.markdown thead {
+  @apply bg-secondary/70;
+}
+
+.markdown th {
+  @apply text-left p-2 border border-secondary;
+}
+
+.markdown td {
+  @apply p-2 border border-secondary;
+}
+
+/* Animation for panel transition */
+.slide-in {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateX(-10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
